@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -40,8 +42,9 @@ public class UserService {
   }
 
   public User createUser(User newUser) {
+    newUser.setPassword(newUser.getPassword());
+    newUser.setStatus(UserStatus.ONLINE);
     newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.OFFLINE);
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
     // flush() is called
@@ -75,5 +78,37 @@ public class UserService {
     } else if (userByName != null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
     }
+  }
+  public User loginUser(User userToBeChecked) {
+      User userByUsername = userRepository.findByUsername(userToBeChecked.getUsername());
+
+      if (userByUsername == null) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This Username does not exist.");
+      } else if (!Objects.equals(userToBeChecked.getPassword(), userByUsername.getPassword())) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password not correct.");
+      }else {
+          userByUsername.setStatus(UserStatus.ONLINE);
+          userByUsername.setToken(UUID.randomUUID().toString());
+          return userByUsername;}
+  }
+
+  public void logoutUser(User userToLogout) {
+      User userByToken = userRepository.findByToken(userToLogout.getToken());
+      System.out.println(userToLogout.getToken());
+      if (userByToken == null){
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This User does not exist.");
+      } else {
+          userByToken.setStatus(UserStatus.OFFLINE);
+
+          log.debug("Logout Service successful");
+      }
+  }
+
+  public User getUser(Long id) {
+      User foundUser = this.userRepository.findById(id).orElse(null);
+      if (foundUser == null){
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The user you searched for doesn't exist");
+      }
+      return foundUser;
   }
 }

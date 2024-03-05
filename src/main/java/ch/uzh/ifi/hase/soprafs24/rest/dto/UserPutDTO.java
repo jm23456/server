@@ -1,20 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-public class UserPostDTO {
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 
-  private String name;
+
+public class UserPutDTO {
 
   private String username;
 
   private String password;
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
 
   public String getUsername() {
     return username;

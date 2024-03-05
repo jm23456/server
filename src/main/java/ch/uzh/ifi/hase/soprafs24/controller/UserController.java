@@ -2,14 +2,20 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserLogoutDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * User Controller
@@ -22,6 +28,8 @@ import java.util.List;
 public class UserController {
 
   private final UserService userService;
+
+  private final Logger log = LoggerFactory.getLogger(UserController.class);
 
   UserController(UserService userService) {
     this.userService = userService;
@@ -52,6 +60,54 @@ public class UserController {
     // create user
     User createdUser = userService.createUser(userInput);
     // convert internal representation of user back to API
-    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
+    return DTOMapper.INSTANCE.convertEntityToUserDTO(createdUser);
+  }
+  @PutMapping("/users/login")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public UserGetDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
+      // convert API user to internal representation
+      User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+
+      // create user
+      User loggedInUser = userService.loginUser(userInput);
+      // convert internal representation of user back to API
+      log.debug("Login successful");
+      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(loggedInUser);
+
+
+  }
+  @PutMapping("/logout")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public void logoutUser(@RequestBody UserLogoutDTO userLogoutDTO) {
+      // convert API user to internal representation
+      User userInput = DTOMapper.INSTANCE.convertUserLogoutDTOtoEntity(userLogoutDTO);
+      // create user
+      userService.logoutUser(userInput);
+
+      log.debug("Logout Controller successful");
+      // convert internal representation of user back to API
+      //return DTOMapper.INSTANCE.convertEntityToUserPutDTO(loggedOutUser);
+  }
+  @GetMapping("/users/${id}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public UserGetDTO getUser(@PathVariable("id") String id) {
+      Long idLong = convertStringToLong(id);
+      assert idLong != null;
+    User foundUser = userService.getUser(idLong);
+    System.out.println("found user");
+    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(foundUser);
+  }
+
+  private long  convertStringToLong(String id) {
+      Long idLong;
+      try {
+          idLong = Long.parseLong(id);
+      } catch (NumberFormatException e){
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Your search couldn't be found, make sure to use integers and not other elements");
+      }
+      return idLong;
   }
 }

@@ -16,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 
 /**
  * User Controller
@@ -90,19 +92,19 @@ public class UserController {
       // convert internal representation of user back to API
       //return DTOMapper.INSTANCE.convertEntityToUserPutDTO(loggedOutUser);
   }
-  @GetMapping("/users/${id}")
+  @GetMapping("/users/{id}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public UserGetDTO getUser(@PathVariable("id") String id) {
       Long idLong = convertStringToLong(id);
       assert idLong != null;
-    User foundUser = userService.getUser(idLong);
-    System.out.println("found user");
-    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(foundUser);
+      User foundUser = userService.getUser(idLong);
+      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(foundUser);
   }
 
   private long  convertStringToLong(String id) {
       Long idLong;
+
       try {
           idLong = Long.parseLong(id);
       } catch (NumberFormatException e){
@@ -110,4 +112,19 @@ public class UserController {
       }
       return idLong;
   }
+
+    @PutMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void editUser(@RequestBody UserPutDTO userPutDTO, @PathVariable("id") String id) {
+        System.out.println("ID:" + id);
+        Long idLong = convertStringToLong(id);
+        assert idLong != null;
+        System.out.println(userPutDTO);
+        User UserInput = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
+        userService.editUser(UserInput, idLong);
+        System.out.println("BIRTHDAY:" +userPutDTO.getBirthday());
+
+        //return DTOMapper.INSTANCE.convertEntityToUserPutDTO(foundUser);
+    }
 }

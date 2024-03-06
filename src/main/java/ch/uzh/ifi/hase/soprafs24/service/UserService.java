@@ -71,12 +71,12 @@ public class UserService {
 
     String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
     if (userByUsername != null && userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+      throw new ResponseStatusException(HttpStatus.CONFLICT,
           String.format(baseErrorMessage, "username and the name", "are"));
     } else if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
+      throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
     } else if (userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
+      throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "name", "is"));
     }
   }
   public User loginUser(User userToBeChecked) {
@@ -110,5 +110,34 @@ public class UserService {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The user you searched for doesn't exist");
       }
       return foundUser;
+  }
+  public User checkUser(User UserToCheck) {
+      if (UserToCheck.getStatus() == UserStatus.ONLINE){
+          return UserToCheck;
+      }else {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This User is not logged in. You cannot see the User Profile");
+      }
+  }
+
+  public void editUser(User changedUser, Long id) {
+      User foundUser= getUser(id);
+      System.out.println("Give me my USERNAME" +changedUser.getUsername());
+      User UserByUsername = userRepository.findByUsername(changedUser.getUsername());
+      System.out.println("USERNAME" +changedUser.getUsername());
+      if (!changedUser.getToken().equals(foundUser.getToken())) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not logged in as the user you want to edit.");
+      }
+      if (changedUser.getUsername() != null && changedUser.getBirthday() != null) {
+          foundUser.setUsername(changedUser.getUsername());
+          foundUser.setBirthday(changedUser.getBirthday());
+      }
+      else if (changedUser.getUsername() == null && changedUser.getBirthday() != null) {
+          foundUser.setBirthday(changedUser.getBirthday());
+      }
+      else {
+          foundUser.setUsername(changedUser.getUsername());
+      }
+      System.out.println("CHANGEDUSER" +foundUser);
+
   }
 }

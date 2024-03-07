@@ -15,6 +15,8 @@ public class UserGetDTO {
 
   private LocalDate birthday;
 
+  private LocalDate creationdate;
+
   private String token;
 
   public Long getId() {
@@ -56,5 +58,7 @@ public class UserGetDTO {
     public LocalDate getBirthday() {return birthday;}
 
     public void setBirthday(LocalDate birthday) {this.birthday = birthday;}
+    public LocalDate getCreationdate() {return creationdate;}
 
+    public void setCreationdate(LocalDate creationdate) {this.creationdate = creationdate;}
 }

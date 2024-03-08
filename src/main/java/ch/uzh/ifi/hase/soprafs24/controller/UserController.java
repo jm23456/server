@@ -107,7 +107,7 @@ public class UserController {
       try {
           idLong = Long.parseLong(id);
       } catch (NumberFormatException e){
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Your search couldn't be found, make sure to use integers and not other elements");
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND);
       }
       return idLong;
   }
@@ -121,6 +121,5 @@ public class UserController {
         User UserInput = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
         userService.editUser(UserInput, idLong);
         System.out.println("BIRTHDAY:" +userPutDTO.getBirthday());
-
     }
 }

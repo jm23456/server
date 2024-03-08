@@ -134,7 +134,6 @@ public class UserServiceIntegrationTest {
 
       //get id from changedUser
       Long id = changedUser.getId();
-
       //save birthday you want to add to user
       LocalDate birthday = LocalDate.of(2022,10,8);
       // change birthday

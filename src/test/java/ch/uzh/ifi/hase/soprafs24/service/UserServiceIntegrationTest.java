@@ -116,7 +116,10 @@ public class UserServiceIntegrationTest {
       Long testUserID = 1L;
 
       // check that an error is thrown because ID doesn't exist.
-      assertThrows(ResponseStatusException.class, () -> userService.getUser(testUserID));
+      ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.getUser(testUserID));
+
+      //check that thrown exception is status code 404
+      assertEquals(404, exception.getStatus().value());
   }
 
   //Test 5
@@ -168,6 +171,8 @@ public class UserServiceIntegrationTest {
       foundUser.setToken("0");
 
       // check that an error is thrown because Tokens don't match
-      assertThrows(ResponseStatusException.class, () -> userService.editUser(foundUser, id));
+      ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.editUser(foundUser, id));
+      //check that thrown exception is status code 404
+      assertEquals(404, exception.getStatus().value());
   }
 }

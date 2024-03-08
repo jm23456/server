@@ -64,7 +64,7 @@ public class UserController {
     // convert internal representation of user back to API
     return DTOMapper.INSTANCE.convertEntityToUserDTO(createdUser);
   }
-  @PutMapping("/users/login")
+  @PostMapping("/users/login")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public UserGetDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
@@ -75,8 +75,7 @@ public class UserController {
       User loggedInUser = userService.loginUser(userInput);
       // convert internal representation of user back to API
       log.debug("Login successful");
-      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(loggedInUser);
-
+      return DTOMapper.INSTANCE.convertEntityToUserDTO(loggedInUser);
 
   }
   @PutMapping("/logout")
@@ -117,14 +116,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
     public void editUser(@RequestBody UserPutDTO userPutDTO, @PathVariable("id") String id) {
-        System.out.println("ID:" + id);
         Long idLong = convertStringToLong(id);
         assert idLong != null;
-        System.out.println(userPutDTO);
         User UserInput = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
         userService.editUser(UserInput, idLong);
         System.out.println("BIRTHDAY:" +userPutDTO.getBirthday());
 
-        //return DTOMapper.INSTANCE.convertEntityToUserPutDTO(foundUser);
     }
 }

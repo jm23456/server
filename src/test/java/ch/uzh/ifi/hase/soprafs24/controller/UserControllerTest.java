@@ -68,7 +68,7 @@ public class UserControllerTest {
         .andExpect(jsonPath("$[0].status", is(user.getStatus().toString())));
   }
 
-  @Test
+    @Test
   public void createUser_validInput_userCreated() throws Exception {
     // given
     User user = new User();
@@ -98,7 +98,7 @@ public class UserControllerTest {
         .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
   }
 
-  /**
+    /**
    * Helper Method to convert userPostDTO into a JSON string such that the input
    * can be processed
    * Input will look like this: {"name": "Test User", "username": "testUsername"}

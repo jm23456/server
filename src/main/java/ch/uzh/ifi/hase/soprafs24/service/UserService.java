@@ -113,19 +113,11 @@ public class UserService {
       }
       return foundUser;
   }
-  public User checkUser(User UserToCheck) {
-      if (UserToCheck.getStatus() == UserStatus.ONLINE){
-          return UserToCheck;
-      }else {
-          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This User is not logged in. You cannot see the User Profile");
-      }
-  }
 
   public void editUser(User changedUser, Long id) {
       User foundUser= getUser(id);
-      System.out.println("Give me my USERNAME" +changedUser.getUsername());
       User UserByUsername = userRepository.findByUsername(changedUser.getUsername());
-      System.out.println("USERNAME" +changedUser.getUsername());
+      //check that the logged in user (changedUser) and user you want to change (foundUSer) is the same.
       if (!changedUser.getToken().equals(foundUser.getToken())) {
           throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You are not logged in as the user you want to edit.");
       }
@@ -139,7 +131,6 @@ public class UserService {
       else {
           foundUser.setUsername(changedUser.getUsername());
       }
-      System.out.println("CHANGEDUSER" +foundUser);
 
   }
 }
